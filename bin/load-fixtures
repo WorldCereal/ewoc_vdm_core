@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+/**
+ * This script loads fixtures.
+ *
+ * Useful in development.
+ */
+
+const {spawn} = require('child_process');
+const {pgConfig} = require('../config');
+
+const options = {
+    '-h': pgConfig.normal.host,
+    '-U': pgConfig.normal.user,
+    '-f': `${__dirname}/../fixtures.sql`,
+};
+
+const args = [...Object.entries(options).flat(), pgConfig.normal.database];
+
+spawn('psql', args, {
+    env: {PATH: process.env.PATH, PGPASSWORD: pgConfig.normal.password},
+    stdio: 'inherit',
+    shell: true,
+});

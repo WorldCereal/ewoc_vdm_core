@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+/**
+ * This script creates all possible permissions. Every permission can then be assigned
+ * to some user via `assign-all-permissions` script.
+ *
+ * Useful in development.
+ */
+
+const _ = require('lodash/fp');
+require('../src/applications/index');
+const getPlan = require('../src/applications/plan').get;
+const uuid = require('../src/uuid');
+const qb = require('@imatic/pgqb');
+const db = require('../src/db');
+
+const flatMapWithKey = _.flatMap.convert({cap: false});
+
+const permissions = ['view', 'create', 'update', 'delete'];
+const typesByGroup = _.mapValues(_.keys, getPlan());
+
+const columns = ['key', 'resourceGroup', 'resourceType', 'permission'];
+
+function typeToValues(types, group) {
+    return _.flatMap((type) => {
+        return _.map(
+            (p) => _.map(qb.val.inlineParam, [uuid.generate(), group, type, p]),
+            permissions
+        );
+    }, types);
+}
+
+async function main() {
+    await db.init();
+
+    const sqlMap = qb.merge(
+        qb.insertInto('user.permissions'),
+        qb.columns(columns),
+        qb.values(flatMapWithKey(typeToValues, typesByGroup))
+    );
+
+    await db.query(qb.toSql(sqlMap));
+}
+
+main().then(() => process.exit());
