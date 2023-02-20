@@ -14,7 +14,6 @@ const init = async () => {
 		const app = express();
 		app.use(cors({origin: true, credentials: true}));
 		app.use(applicationsRouter);
-		// app.use(cors({origin: ["http://localhost:3001"]}));
 		app.listen(config.masterPort, () => {
 			console.log(`#NOTE# Master is listening on port ${config.masterPort}`);
 		});

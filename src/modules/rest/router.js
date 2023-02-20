@@ -1,14 +1,12 @@
 const userMiddleware = require('../../middlewares/user');
 const authMiddleware = require('../../middlewares/auth');
 const autoLoginMiddleware = require('../../middlewares/auto-login');
+const autoLoginKongHqMiddleware = require('../../middlewares/auto-login-konghq');
 const hashMiddleware = require('../../middlewares/hash');
 const _ = require('lodash/fp');
-const stringUuid = require('uuid-by-string');
 const commandResult = require('./result');
 
 const forEachWithKey = _.forEach.convert({ cap: false });
-
-const responseCache = {};
 
 /**
  * @param {{type: string, data: any}} result
@@ -57,23 +55,17 @@ function createGroup(plan, group, commands) {
             responses: { 200: {} },
             middlewares: [
                 userMiddleware,
+                autoLoginKongHqMiddleware,
                 autoLoginMiddleware,
                 authMiddleware,
                 hashMiddleware,
             ],
             handler: async function (request, response) {
-                let requestHash = stringUuid(JSON.stringify({ url: request.originalUrl, data: request.body }));
-                if (responseCache.hasOwnProperty(requestHash)) {
-                    sendResponse(responseCache[requestHash], response);
-                } else {
-                    const responseData = resultToResponse(
-                        await commands.list.handler(request)
-                    );
+                const responseData = resultToResponse(
+                    await commands.list.handler(request)
+                );
 
-                    responseCache[requestHash] = responseData;
-
-                    sendResponse(responseData, response);
-                }
+                sendResponse(responseData, response);
             },
         },
         {

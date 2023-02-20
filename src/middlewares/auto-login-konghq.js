@@ -7,12 +7,8 @@ const UserType = {
     USER: 'user'
 };
 
-const worldCerealUserKeyMap = {
-    "0000": "a7365eb7-e986-4660-8eed-3dd3a6350024"
-}
-
 /**
- * If no user is logged in, logs in user by X-User-Info header provided by KongHQ.
+ * If no user is logged in, logs in user by x-userinfo header provided by KongHQ.
  */
 async function autoLoginKongHqMiddleware(request, response, next) {
     if (!config.isBehindKong) {
@@ -23,26 +19,30 @@ async function autoLoginKongHqMiddleware(request, response, next) {
         return next();
     }
 
-    let kongUserKey = request.headers['x-user-info'];
-
-    // TODO This is just quick fix and has to be removed in next phase
-    if (worldCerealUserKeyMap.hasOwnProperty(kongUserKey)) {
-        console.log(`#WARNING# Invalid UUID ${kongUserKey} was replaced with proper one! This has to be solved!`);
-        kongUserKey = worldCerealUserKeyMap[kongUserKey];
-    }
-
-    if (!uuid.isValid(kongUserKey)) {
+    const xUserInfo = request.headers['x-userinfo'];
+    if (!xUserInfo) {
         return next();
     }
 
-    if (!await q.getUserInfoByKey(kongUserKey)) {
+    let xUserInfoDecoded;
+    try {
+        xUserInfoDecoded = JSON.parse(Buffer.from(xUserInfo, 'base64'));
+    } catch(e) {
+        return next();
+    }
+
+    if (!uuid.isValid(xUserInfoDecoded.userid)) {
+        return next();
+    }
+
+    if (!await q.getUserInfoByKey(xUserInfoDecoded.userid)) {
         return next();
     }
 
     const user = {
-        key: kongUserKey,
+        key: xUserInfoDecoded.userid,
         type: UserType.USER,
-        realKey: kongUserKey
+        realKey: xUserInfoDecoded.userid
     };
 
     const token = await auth.createAuthToken(

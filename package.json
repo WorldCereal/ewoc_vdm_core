@@ -11,9 +11,11 @@
     "url": "https://github.com/gisat-panther/be-core/issues"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.76.0",
     "@gisatcz/ptr-tile-grid": "^0.0.8",
     "@imatic/pgqb": "^0.1.30",
     "adm-zip": "^0.5.6",
+    "axios": "^1.1.3",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
@@ -24,9 +26,11 @@
     "joi-to-swagger": "^5.2.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "mime-types": "^2.1.35",
     "moment": "^2.29.1",
     "moment-interval": "^0.2.1",
     "multer": "^1.4.3",
+    "node-fetch": "^2.6.7",
     "object-hash": "^2.2.0",
     "passport": "^0.4.1",
     "passport-facebook": "^3.0.0",
@@ -34,25 +38,26 @@
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
     "postgrator": "^4.2.0",
-    "redis": "^3.1.2",
+    "redis": "^4.1.0",
     "sql-template-strings": "^2.2.2",
     "swagger-ui-express": "^4.1.6",
     "uuid": "^8.3.2",
     "uuid-by-string": "^3.0.4",
+    "xml-js": "^1.6.11",
+    "yaml": "^2.0.1",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@auto-it/git-tag": "^10.4.2",
     "auto": "^10.4.2",
-    "axios": "^0.24.0",
     "chai": "^4.3.4",
     "eslint": "^7.32.0",
     "faker": "^5.5.3",
     "mocha": "^9.1.1",
-    "node-fetch": "^2.6.2",
     "node-mocks-http": "^1.10.1",
-    "nodemon": "^2.0.12",
+    "nodemon": "^2.0.19",
     "npm-watch": "^0.11.0",
+    "nyc": "^15.1.0",
     "wait-port": "^0.2.9"
   },
   "watch": {
@@ -74,6 +79,7 @@
     "db:start": "docker run -it --rm -p 5432:5432/tcp -e POSTGRES_PASSWORD=postgres -e TZ=Europe/Prague gisat/postgis:13",
     "load-performance-fixtures": "./bin/load-fixtures && ./bin/create-all-permissions && ./bin/assign-all-permissions-to-user 2d069e3a-f77f-4a1f-aeda-50fd06c8c35d && ./bin/load-performance-fixtures",
     "create-all-permissions-for-guest": "./bin/create-all-permissions && ./bin/assign-all-permissions-to-group 52ddabec-d01a-49a0-bb4d-5ff931bd346e",
-    "test:worldCereal": "eslint ./panther-apps/worldCereal/ && ./panther-apps/worldCereal/bin/init && mocha -b --full-trace --exit ./panther-apps/worldCereal/tests/**/*.js"
+    "test:worldCereal": "eslint ./panther-apps/worldCereal/ && ./panther-apps/worldCereal/bin/init && mocha -b --full-trace --exit ./panther-apps/worldCereal/tests/**/*.js",
+    "test:cure": "mocha -b --full-trace --exit ./panther-apps/cure/tests/**/*.js"
   }
 }

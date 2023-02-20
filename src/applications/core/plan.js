@@ -790,6 +790,14 @@ module.exports = {
                     resourceGroup: 'application',
                     resourceType: 'applications',
                 },
+                scope: {
+                    type: 'manyToOne',
+                    relationTable: 'relations.caseRelation',
+                    ownKey: 'parentCaseKey',
+                    inverseKey: 'scopeKey',
+                    resourceGroup: 'metadata',
+                    resourceType: 'scopes',
+                },
                 tag: {
                     type: 'manyToMany',
                     relationTable: 'relations.caseRelation',
@@ -1246,6 +1254,32 @@ module.exports = {
                 },
             },
         },
+        accesses: {
+            table: 'accesses',
+            context: {
+                list: {
+                    columns: ['key', 'data'],
+                },
+                create: {
+                    columns: ['key', 'data'],
+                },
+                update: {
+                    columns: ['key', 'data'],
+                },
+            },
+            columns: {
+                key: {
+                    defaultValue: () => uuid.generate(),
+                    schema: Joi.string().uuid(),
+                },
+                data: {
+                    defaultValue: null,
+                    schema: Joi.object().allow(null),
+                },
+            },
+            relations: {
+            },
+        }
     },
     dataSources: {
         timeSerie: {
@@ -1470,6 +1504,7 @@ module.exports = {
                                     'url',
                                     'layers',
                                     'styles',
+                                    'params',
                                     'configuration',
                                 ],
                             },
@@ -1478,6 +1513,7 @@ module.exports = {
                                     'url',
                                     'layers',
                                     'styles',
+                                    'params',
                                     'configuration',
                                 ],
                             },
@@ -1486,6 +1522,7 @@ module.exports = {
                                     'url',
                                     'layers',
                                     'styles',
+                                    'params',
                                     'configuration',
                                 ],
                             },
@@ -1504,6 +1541,10 @@ module.exports = {
                                 defaultValue: null,
                                 schema: Joi.string().allow(null),
                             },
+                            params: {
+                                defaultValue: null,
+                                schema: Joi.object().allow(null),
+                            },
                             configuration: {
                                 defaultValue: null,
                                 schema: Joi.object().allow(null),
@@ -1513,13 +1554,13 @@ module.exports = {
                     wmts: {
                         context: {
                             list: {
-                                columns: ['urls'],
+                                columns: ['urls', 'configuration'],
                             },
                             create: {
-                                columns: ['urls'],
+                                columns: ['urls', 'configuration'],
                             },
                             update: {
-                                columns: ['urls'],
+                                columns: ['urls', 'configuration'],
                             },
                         },
                         columns: {
@@ -1527,8 +1568,35 @@ module.exports = {
                                 defaultValue: null,
                                 schema: Joi.array().items(Joi.string()).allow(null),
                             },
+                            configuration: {
+                                defaultValue: null,
+                                schema: Joi.object().allow(null),
+                            },
                         },
                     },
+                    cog: {
+                        context: {
+                            list: {
+                                columns: ['url', 'configuration'],
+                            },
+                            create: {
+                                columns: ['url', 'configuration'],
+                            },
+                            update: {
+                                columns: ['url', 'configuration'],
+                            },
+                        },
+                        columns: {
+                            url: {
+                                defaultValue: null,
+                                schema: Joi.string().allow(null),
+                            },
+                            configuration: {
+                                defaultValue: null,
+                                schema: Joi.object().allow(null),
+                            },
+                        },
+                    }
                 },
             },
             context: {
@@ -1564,7 +1632,8 @@ module.exports = {
                         'tiledVector',
                         'vector',
                         'wms',
-                        'wmts'
+                        'wmts',
+                        'cog'
                     ),
                     index: true
                 },
@@ -2106,6 +2175,14 @@ module.exports = {
                     inverseKey: 'applicationKey',
                     resourceGroup: 'application',
                     resourceType: 'applications',
+                },
+                tag: {
+                    type: 'manyToMany',
+                    relationTable: 'relations.viewRelation',
+                    ownKey: 'parentViewKey',
+                    inverseKey: 'tagKey',
+                    resourceGroup: 'metadata',
+                    resourceType: 'tags',
                 },
             },
         },
